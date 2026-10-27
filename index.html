@@ -1,113 +1,199 @@
 <!doctype html>
-<html lang="id">
+<html lang="id" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <meta name="color-scheme" content="light dark">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%B2%3C/text%3E%3C/svg%3E">
 <title>Malam ini ngapain?</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%B2%3C/text%3E%3C/svg%3E">
+<script>
+  // Pasang tema sebelum halaman digambar, supaya tidak berkedip.
+  try {
+    var m = localStorage.getItem("malam-ini-theme");
+    var d = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    document.documentElement.dataset.theme = (m === "dark" || (m !== "light" && d)) ? "dark" : "light";
+  } catch (e) {}
+</script>
 <style>
   :root {
-    --bg: #f6f1ea;
-    --card: #ffffff;
-    --ink: #2b2622;
-    --muted: #7a6f66;
-    --line: #e7ddd1;
-    --accent: #d2553a;
-    --accent-ink: #fff8f3;
-    --chip: #efe6da;
+    color-scheme: light;
+    --bg: #f1ece4;
+    --card: #f9f6f0;
+    --ink: #2e2a26;
+    --muted: #6a6056;
+    --line: #dfd6c9;
+    --chip: #e8e0d3;
+    --accent: #b8432a;
+    --accent-ink: #fff8f2;
+    --field: #f1ece4;
+    --shadow: 0 1px 0 rgba(255,255,255,.6) inset, 0 10px 24px -14px rgba(60, 40, 20, .35);
+    --scrim: rgba(40, 30, 20, .55);
   }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg: #191614; --card: #24201d; --ink: #f1e9e0; --muted: #a79a8e;
-      --line: #3a342f; --accent: #ee7a5f; --accent-ink: #2a1510; --chip: #332d28;
-    }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #2b2824;
+    --card: #36312b;
+    --ink: #ece5db;
+    --muted: #b8ad9f;
+    --line: #4d463e;
+    --chip: #433d35;
+    --accent: #f0956f;
+    --accent-ink: #2b160e;
+    --field: #2f2b26;
+    --shadow: 0 10px 24px -14px rgba(0, 0, 0, .55);
+    --scrim: rgba(0, 0, 0, .6);
   }
   * { box-sizing: border-box; }
   html { background: var(--bg); }
   body {
     margin: 0; background: var(--bg); color: var(--ink);
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    line-height: 1.5; padding: 24px 16px 80px;
+    line-height: 1.5; padding: 22px 16px 90px;
+    transition: background-color .25s ease, color .25s ease;
   }
-  main { max-width: 520px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
-  h1 { margin: 0; font-size: 1.7rem; line-height: 1.2; }
-  .sub { margin: 4px 0 6px; color: var(--muted); }
-  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px; }
-  h2 { margin: 0 0 10px; font-size: 1rem; }
+  main { max-width: 640px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
   [hidden] { display: none !important; }
+  h1 { margin: 0; font-size: 1.75rem; line-height: 1.2; }
+  h2 { margin: 0 0 10px; font-size: 1.05rem; }
+  .sub { margin: 4px 0 12px; color: var(--muted); }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 18px; box-shadow: var(--shadow); transition: background-color .25s, border-color .25s; }
+  .note { color: var(--muted); margin: 0; font-size: .92rem; }
+  .err { color: var(--accent); font-weight: 600; }
 
+  /* ---------- kontrol umum ---------- */
+  .seg { display: inline-flex; background: var(--chip); border: 1px solid var(--line); border-radius: 12px; padding: 3px; gap: 2px; }
+  .seg button {
+    border: 0; background: transparent; color: var(--muted); font: inherit; font-size: .85rem; font-weight: 600;
+    padding: 7px 12px; min-height: 36px; border-radius: 9px; cursor: pointer; transition: background-color .15s, color .15s;
+  }
+  .seg button[aria-pressed="true"] { background: var(--card); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.18); }
   .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
   .chip {
     border: 1px solid var(--line); background: var(--chip); color: var(--ink);
     border-radius: 999px; padding: 8px 14px; min-height: 40px; font: inherit; font-size: .9rem; cursor: pointer;
+    transition: transform .12s, background-color .15s;
   }
+  .chip:active { transform: scale(.96); }
   .chip[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 700; }
-
-  .result {
-    min-height: 96px; display: grid; place-items: center; text-align: center;
-    padding: 12px; margin-bottom: 12px; border-radius: 12px; border: 2px dashed var(--line);
-    font-size: 1.35rem; font-weight: 700; overflow-wrap: anywhere;
-  }
-  .result small { display: block; color: var(--muted); font-size: .85rem; font-weight: 400; margin-top: 4px; }
-  .result.empty { color: var(--muted); font-weight: 400; font-size: 1rem; }
-  .result.spin { border-style: solid; border-color: var(--accent); }
-  .result.final { border-style: solid; border-color: var(--accent); animation: pop .35s ease-out; }
-  @keyframes pop { from { transform: scale(.94); } to { transform: none; } }
-
-  .row { display: flex; gap: 8px; flex-wrap: wrap; }
   .btn {
     min-height: 46px; padding: 10px 20px; border: 0; border-radius: 12px; cursor: pointer;
     background: var(--accent); color: var(--accent-ink); font: inherit; font-weight: 700; font-size: 1rem;
+    transition: transform .12s, filter .15s;
   }
+  .btn:hover { filter: brightness(1.05); }
+  .btn:active { transform: scale(.97); }
   .btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); font-weight: 600; }
   .btn.big { flex: 1 1 140px; }
-  .btn:disabled { opacity: .5; cursor: default; }
-  .btn:focus-visible, .chip:focus-visible, .icon:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible, .toast button:focus-visible {
-    outline: 3px solid var(--accent); outline-offset: 2px;
-  }
-
-  form { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
-  form input[type="text"] { grid-column: 1 / -1; }
-  input[type="text"], select {
-    min-height: 46px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line);
-    background: var(--bg); color: var(--ink); font: inherit; width: 100%;
-  }
-
-  ul { list-style: none; margin: 0; padding: 0; }
-  li { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); }
-  li:first-child { border-top: 0; }
-  li .t { flex: 1; overflow-wrap: anywhere; }
-  li .c { color: var(--muted); font-size: .8rem; background: var(--chip); border-radius: 999px; padding: 2px 10px; white-space: nowrap; }
+  .btn.sm { min-height: 40px; padding: 6px 14px; font-size: .9rem; }
+  .btn:disabled { opacity: .55; cursor: default; filter: none; transform: none; }
+  .linkbtn { background: none; border: 0; padding: 6px 0; min-height: 36px; color: var(--accent); font: inherit; font-size: .9rem; font-weight: 600; text-decoration: underline; cursor: pointer; text-align: left; }
   .icon {
     width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--line); background: transparent;
     color: var(--ink); font-size: 1rem; cursor: pointer; display: grid; place-items: center; flex: none;
   }
-  .empty-note { color: var(--muted); margin: 0; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  input[type="text"], select {
+    min-height: 46px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line);
+    background: var(--field); color: var(--ink); font: inherit; width: 100%;
+  }
+  .btn:focus-visible, .chip:focus-visible, .icon:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible,
+  .seg button:focus-visible, .linkbtn:focus-visible, .popen:focus-visible, .padd:focus-visible, a:focus-visible {
+    outline: 3px solid var(--accent); outline-offset: 2px;
+  }
+
+  /* ---------- sampul & lencana ---------- */
+  .cover { position: relative; background: var(--chip); border-radius: 10px; overflow: hidden; aspect-ratio: 2 / 3; flex: none; }
+  .cover .ph { position: absolute; inset: 0; display: grid; place-items: center; font-size: 2rem; font-weight: 700; color: var(--muted); }
+  .cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .cover.sm { width: 84px; }
+  .cover.xs { width: 40px; border-radius: 6px; }
+  .cover.xs .ph { font-size: 1rem; }
+  .pill { position: absolute; top: 6px; right: 6px; background: rgba(30, 24, 18, .78); color: #fff; font-size: .75rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
+  .badge { display: inline-block; background: var(--chip); color: var(--ink); border: 1px solid var(--line); border-radius: 999px; font-size: .75rem; font-weight: 600; padding: 2px 10px; margin: 0 6px 6px 0; }
+  .badge.accent { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+
+  /* ---------- pilihan acak ---------- */
+  .result {
+    min-height: 110px; display: grid; place-items: center; text-align: center;
+    padding: 14px; margin-bottom: 12px; border-radius: 14px; border: 2px dashed var(--line);
+    font-size: 1.3rem; font-weight: 700; overflow-wrap: anywhere;
+  }
+  .result small { display: block; color: var(--muted); font-size: .85rem; font-weight: 400; margin-top: 4px; }
+  .result.empty { color: var(--muted); font-weight: 400; font-size: 1rem; }
+  .result.spin { border-style: solid; border-color: var(--accent); }
+  .result.final { display: flex; gap: 14px; text-align: left; align-items: flex-start; border-style: solid; border-color: var(--accent); animation: pop .35s ease-out; }
+  .rtext { flex: 1; min-width: 0; font-weight: 400; }
+  .rtitle { display: block; font-size: 1.2rem; line-height: 1.3; }
+  .rsub { display: block; color: var(--muted); font-size: .85rem; margin: 2px 0 6px; }
+  .rsyn { margin: 0 0 4px; font-size: .9rem; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  @keyframes pop { from { transform: scale(.95); opacity: .6; } to { transform: none; opacity: 1; } }
+
+  /* ---------- populer ---------- */
+  .pop-bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 12px 0; }
+  .pop-bar select { width: auto; flex: 1 1 150px; }
+  .pgrid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(138px, 1fr)); gap: 14px; }
+  .pcard { position: relative; border-radius: 14px; transition: transform .15s ease; animation: fadeUp .35s ease both; }
+  @media (hover: hover) { .pcard:hover { transform: translateY(-3px); } }
+  .popen { display: block; width: 100%; text-align: left; background: none; border: 0; padding: 0; color: inherit; font: inherit; cursor: pointer; border-radius: 14px; }
+  .popen .cover { width: 100%; border-radius: 12px; box-shadow: var(--shadow); }
+  .ptitle { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-weight: 700; font-size: .92rem; line-height: 1.3; margin: 8px 0 2px; min-height: 2.6em; }
+  .pmeta { color: var(--muted); font-size: .78rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pkind { position: absolute; left: 6px; bottom: 6px; background: var(--accent); color: var(--accent-ink); font-size: .7rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
+  .padd {
+    position: absolute; top: 6px; left: 6px; width: 38px; height: 38px; border-radius: 50%; border: 0; cursor: pointer;
+    background: var(--card); color: var(--ink); font-size: 1.25rem; font-weight: 700; display: grid; place-items: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,.35); transition: transform .12s;
+  }
+  .padd:active { transform: scale(.9); }
+  .padd:disabled { background: var(--accent); color: var(--accent-ink); cursor: default; }
+  .skel .cover { animation: shimmer 1.3s ease-in-out infinite; }
+  .skel .bar { height: 12px; border-radius: 6px; background: var(--chip); margin-top: 10px; animation: shimmer 1.3s ease-in-out infinite; }
+  @keyframes shimmer { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  /* ---------- daftar ---------- */
+  form { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+  form input[type="text"] { grid-column: 1 / -1; }
+  ul.items { list-style: none; margin: 0; padding: 0; }
+  ul.items li { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); }
+  ul.items li:first-child { border-top: 0; }
+  li .t { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+  li .t .name { display: block; font-weight: 600; }
+  li .t .sub2 { display: block; color: var(--muted); font-size: .8rem; }
+  li .c { color: var(--muted); font-size: .78rem; background: var(--chip); border-radius: 999px; padding: 2px 10px; white-space: nowrap; }
+  li.is-done .name { text-decoration: line-through; color: var(--muted); }
   details summary { cursor: pointer; font-weight: 700; min-height: 40px; display: flex; align-items: center; }
-  details ul { margin-top: 6px; }
-  li.is-done .t { text-decoration: line-through; color: var(--muted); }
-  .banner { background: #fff1cc; color: #5a4300; border-radius: 12px; padding: 10px 12px; font-size: .9rem; }
+  .banner { background: var(--chip); border: 1px solid var(--line); color: var(--ink); border-radius: 12px; padding: 10px 12px; font-size: .9rem; }
+  .empty-art { text-align: center; color: var(--muted); padding: 10px 0 2px; }
+  .empty-art .big { font-size: 2rem; display: block; }
+
+  /* ---------- detail ---------- */
+  dialog { border: 1px solid var(--line); border-radius: 20px; background: var(--card); color: var(--ink); padding: 0; width: min(92vw, 520px); max-height: 88vh; box-shadow: 0 20px 50px rgba(0,0,0,.45); }
+  dialog::backdrop { background: var(--scrim); }
+  dialog[open] { animation: fadeUp .25s ease both; }
+  .dwrap { padding: 18px; overflow-y: auto; max-height: 88vh; position: relative; }
+  .dclose { position: absolute; top: 12px; right: 12px; background: var(--card); }
+  .dhead { display: flex; gap: 14px; padding-right: 44px; }
+  .dhead .cover { width: 110px; }
+  .dhead h3 { margin: 0 0 6px; font-size: 1.15rem; line-height: 1.3; overflow-wrap: anywhere; }
+  .syn { white-space: pre-line; margin: 14px 0; font-size: .95rem; line-height: 1.6; }
+  .syn-note { color: var(--muted); font-size: .78rem; margin: -6px 0 12px; }
+  .dactions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .dactions a { color: var(--accent); font-weight: 600; padding: 10px 6px; }
 
   .toast {
     position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%);
-    background: #2b2622; color: #fff; border-radius: 12px; padding: 10px 14px;
-    display: flex; gap: 12px; align-items: center; max-width: calc(100vw - 32px); z-index: 10;
-    box-shadow: 0 8px 20px rgba(0,0,0,.3);
+    background: var(--ink); color: var(--bg); border-radius: 12px; padding: 10px 14px;
+    display: flex; gap: 12px; align-items: center; max-width: calc(100vw - 32px); z-index: 50;
+    box-shadow: 0 8px 20px rgba(0,0,0,.35);
   }
-  .toast button { background: none; border: 0; color: #ffb59f; font: inherit; font-weight: 700; cursor: pointer; padding: 6px; min-height: 36px; }
+  .toast button { background: none; border: 0; color: inherit; font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; padding: 6px; min-height: 36px; }
   .foot { color: var(--muted); font-size: .8rem; text-align: center; margin: 4px 0 0; }
 
-  #popGenre { width: auto; flex: 1 1 140px; }
-  .pop-item .meta { display: block; color: var(--muted); font-size: .8rem; }
-  .pop-item .btn { min-height: 40px; padding: 6px 14px; font-size: .9rem; }
-  .pop-item a { color: var(--muted); font-size: .85rem; padding: 8px 4px; }
-  .pop-item { flex-wrap: wrap; }
-  .pop-note-err { color: #b3261e; }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .pop-note-err { color: #ff8a80; } }
-
-  @media (prefers-reduced-motion: reduce) { .result.final { animation: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
 </style>
 </head>
 <body>
@@ -115,6 +201,11 @@
   <header>
     <h1>Malam ini ngapain?</h1>
     <p class="sub">Isi daftarmu, lalu biar aplikasinya yang memilih.</p>
+    <div class="seg" id="themeSeg" role="group" aria-label="Tema tampilan">
+      <button type="button" data-mode="auto">Otomatis</button>
+      <button type="button" data-mode="light">Terang</button>
+      <button type="button" data-mode="dark">Gelap</button>
+    </div>
   </header>
 
   <div class="banner" id="banner" hidden>Penyimpanan browser tidak tersedia, jadi daftar akan hilang saat halaman ditutup.</div>
@@ -122,7 +213,7 @@
   <section class="card" aria-labelledby="h-pick">
     <h2 id="h-pick">Pilihkan untukku</h2>
     <div class="chips" id="filters" role="group" aria-label="Filter kategori"></div>
-    <div class="result empty" id="result" aria-live="polite">Tekan “Acak!” untuk mulai.</div>
+    <div class="result empty" id="result" aria-live="polite"></div>
     <div class="row">
       <button class="btn big" id="roll" type="button">Acak!</button>
       <button class="btn ghost" id="finish" type="button" hidden>Tandai selesai</button>
@@ -130,17 +221,21 @@
   </section>
 
   <section class="card" aria-labelledby="h-pop">
-    <h2 id="h-pop">Lagi populer: Komik</h2>
-    <p class="empty-note" id="popNote">Diambil dari AniList hanya saat kamu menekan tombol, tidak otomatis. Konten dewasa disaring.</p>
-    <div class="row" style="margin:10px 0">
-      <button class="btn ghost" id="popLoad" type="button">Muat yang populer</button>
+    <h2 id="h-pop">Lagi populer</h2>
+    <div class="seg" id="srcSeg" role="group" aria-label="Sumber populer">
+      <button type="button" data-src="manga" aria-pressed="true">Komik</button>
+      <button type="button" data-src="anime" aria-pressed="false">Anime</button>
+    </div>
+    <p class="note" id="popNote" style="margin-top:10px">Diambil dari AniList hanya saat kamu menekan tombol, tidak otomatis. Konten dewasa disaring.</p>
+    <div class="pop-bar">
+      <button class="btn ghost sm" id="popLoad" type="button">Muat yang populer</button>
       <select id="popGenre" aria-label="Filter genre" hidden></select>
     </div>
-    <ul id="popList"></ul>
+    <ul class="pgrid" id="popList"></ul>
   </section>
 
   <section class="card" aria-labelledby="h-add">
-    <h2 id="h-add">Tambah ke daftar</h2>
+    <h2 id="h-add">Tambah sendiri</h2>
     <form id="addForm" autocomplete="off">
       <input type="text" id="title" maxlength="80" placeholder="Judul film, game, komik, atau lagu…" aria-label="Judul" required>
       <select id="cat" aria-label="Kategori"></select>
@@ -150,42 +245,105 @@
 
   <section class="card" aria-labelledby="h-list">
     <h2 id="h-list">Daftarku (<span id="count">0</span>)</h2>
-    <ul id="list"></ul>
-    <p class="empty-note" id="listEmpty">Belum ada isinya. Tambahkan satu di atas.</p>
+    <ul class="items" id="list"></ul>
+    <div class="empty-art" id="listEmpty"><span class="big" aria-hidden="true">📭</span>Belum ada isinya. Tambahkan satu, atau ambil dari yang populer.</div>
   </section>
 
   <section class="card">
-    <details id="doneBox">
+    <details>
       <summary>Sudah selesai (<span id="doneCount">0</span>)</summary>
-      <ul id="doneList"></ul>
+      <ul class="items" id="doneList"></ul>
     </details>
   </section>
 
   <section class="card" aria-labelledby="h-bk">
     <h2 id="h-bk">Cadangan</h2>
-    <p class="empty-note" style="margin-bottom:10px">Daftar disimpan di browser HP-mu, bukan di server. Kalau data situs dihapus, daftarnya ikut hilang, jadi simpan cadangannya sesekali.</p>
+    <p class="note" style="margin-bottom:10px">Daftar disimpan di browser perangkat ini, bukan di server. Kalau data situs dihapus atau alamat situsnya berubah, daftarnya ikut hilang, jadi simpan cadangannya sesekali.</p>
     <div class="row">
       <button class="btn ghost" id="export" type="button">Simpan cadangan</button>
       <button class="btn ghost" id="importBtn" type="button">Muat cadangan</button>
       <input type="file" id="importFile" accept="application/json,.json" hidden>
     </div>
   </section>
-  <p class="foot">Dibuat sendiri, jalan sepenuhnya di perangkatmu.</p>
+  <p class="foot">Data populer, sampul, dan sinopsis dari AniList. Sinopsis berbahasa Inggris, sesuai sumbernya.</p>
 </main>
+
+<dialog id="detail" aria-labelledby="dTitle">
+  <div class="dwrap">
+    <button class="icon dclose" id="dClose" type="button" aria-label="Tutup detail">✕</button>
+    <div class="dhead">
+      <div id="dCover"></div>
+      <div>
+        <h3 id="dTitle"></h3>
+        <div id="dBadges"></div>
+        <p class="note" id="dGenres"></p>
+      </div>
+    </div>
+    <p class="syn" id="dSyn"></p>
+    <p class="syn-note" id="dSynNote" hidden>Sinopsis berbahasa Inggris dari AniList.</p>
+    <div class="dactions" id="dActions"></div>
+  </div>
+</dialog>
 
 <div class="toast" id="toast" role="status" hidden><span id="toastMsg"></span><button type="button" id="toastBtn" hidden>Urungkan</button></div>
 
 <script>
   const CATS = ["Nonton", "Game", "Komik", "Musik"];
-  const KEY = "malam-ini-v1";
-  const MAX_ITEMS = 500, MAX_LEN = 80;
+  const KEY = "malam-ini-v1", THEME_KEY = "malam-ini-theme";
+  const MAX_ITEMS = 500, MAX_LEN = 80, MAX_SYN = 400;
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const $ = (id) => document.getElementById(id);
+  function el(tag, cls, text) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
 
-  /* ---------- penyimpanan (aman bila diblokir) ---------- */
+  /* ================= TEMA ================= */
+  let mode = "auto";
+  try { const m = localStorage.getItem(THEME_KEY); if (["auto", "light", "dark"].includes(m)) mode = m; } catch (e) {}
+  const mq = window.matchMedia("(prefers-color-scheme: dark)");
+  function applyTheme() {
+    const t = mode === "auto" ? (mq.matches ? "dark" : "light") : mode;
+    document.documentElement.dataset.theme = t;
+    document.querySelectorAll("#themeSeg button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === mode)));
+  }
+  document.querySelectorAll("#themeSeg button").forEach((b) => b.addEventListener("click", () => {
+    mode = b.dataset.mode;
+    try { localStorage.setItem(THEME_KEY, mode); } catch (e) {}
+    applyTheme();
+  }));
+  if (mq.addEventListener) mq.addEventListener("change", () => { if (mode === "auto") applyTheme(); });
+  applyTheme();
+
+  /* ================= PENYIMPANAN ================= */
   let items = [];
   let storageOK = true;
-  function uid() { return (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2)); }
+  const uid = () => (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2));
+
+  function okUrl(u, hostRe) {
+    try {
+      const x = new URL(String(u));
+      return x.protocol === "https:" && hostRe.test(x.hostname) ? x.href : "";
+    } catch (e) { return ""; }
+  }
+  const okCover = (u) => okUrl(u, /(^|\.)anilist\.co$/);
+  const okPage = (u) => okUrl(u, /^anilist\.co$/);
+
+  function valid(x) { return x && typeof x.title === "string" && x.title.trim() && CATS.includes(x.cat); }
+  function clean(x) {
+    const o = { id: typeof x.id === "string" ? x.id : uid(), title: x.title.trim().slice(0, MAX_LEN), cat: x.cat, done: !!x.done };
+    const cover = okCover(x.cover); if (cover) o.cover = cover;
+    const url = okPage(x.url); if (url) o.url = url;
+    if (typeof x.kind === "string" && x.kind.trim()) o.kind = x.kind.trim().slice(0, 24);
+    if (typeof x.syn === "string" && x.syn.trim()) o.syn = x.syn.trim().slice(0, MAX_SYN);
+    if (Array.isArray(x.genres)) { const g = x.genres.filter((s) => typeof s === "string").slice(0, 4).map((s) => s.slice(0, 24)); if (g.length) o.genres = g; }
+    if (typeof x.score === "number" && isFinite(x.score)) o.score = Math.max(0, Math.min(100, Math.round(x.score)));
+    return o;
+  }
+  const hasDetail = (it) => !!(it.cover || it.syn || it.kind || it.url);
+
   function load() {
     try {
       const raw = localStorage.getItem(KEY);
@@ -198,31 +356,80 @@
     try { localStorage.setItem(KEY, JSON.stringify(items)); }
     catch (e) { storageOK = false; $("banner").hidden = false; }
   }
-  function valid(x) { return x && typeof x.title === "string" && x.title.trim() && CATS.includes(x.cat); }
-  function clean(x) { return { id: typeof x.id === "string" ? x.id : uid(), title: x.title.trim().slice(0, MAX_LEN), cat: x.cat, done: !!x.done }; }
 
-  /* ---------- tampilan ---------- */
-  let filter = "Semua";
-  let currentId = null;
-  let spinTimer = null;
+  /* ================= KOMPONEN KECIL ================= */
+  function coverEl(url, title, cls) {
+    const box = el("div", "cover " + (cls || ""));
+    box.appendChild(el("span", "ph", (String(title).trim().charAt(0) || "?").toUpperCase()));
+    box.querySelector(".ph").setAttribute("aria-hidden", "true");
+    if (url) {
+      const img = new Image();
+      img.loading = "lazy"; img.decoding = "async"; img.referrerPolicy = "no-referrer"; img.alt = "";
+      img.addEventListener("error", () => img.remove());
+      img.src = url;
+      box.appendChild(img);
+    }
+    return box;
+  }
+
+  let toastTimer = null, undo = null;
+  function toast(msg, withUndo) {
+    clearTimeout(toastTimer);
+    $("toastMsg").textContent = msg;
+    $("toastBtn").hidden = !withUndo;
+    $("toast").hidden = false;
+    toastTimer = setTimeout(() => { $("toast").hidden = true; if (withUndo) undo = null; }, withUndo ? 6000 : 2200);
+  }
+
+  /* ================= DETAIL (dialog) ================= */
+  const dlg = $("detail");
+  function openDetail(d, actions) {
+    $("dCover").textContent = ""; $("dCover").appendChild(coverEl(d.cover, d.title, ""));
+    $("dTitle").textContent = d.title;
+    const b = $("dBadges"); b.textContent = "";
+    if (d.kind) b.appendChild(el("span", "badge accent", d.kind));
+    if (d.status) b.appendChild(el("span", "badge", d.status));
+    if (d.year) b.appendChild(el("span", "badge", String(d.year)));
+    if (d.score != null) b.appendChild(el("span", "badge", "★ " + d.score + "/100"));
+    $("dGenres").textContent = (d.genres || []).join(", ");
+    $("dSyn").textContent = d.syn || "Belum ada sinopsis.";
+    $("dSynNote").hidden = !d.syn;
+    const a = $("dActions"); a.textContent = "";
+    actions.forEach((x) => a.appendChild(x));
+    if (d.url) {
+      const l = el("a", "", "Buka di AniList");
+      l.href = d.url; l.target = "_blank"; l.rel = "noopener noreferrer";
+      a.appendChild(l);
+    }
+    if (typeof dlg.showModal === "function") dlg.showModal(); else dlg.setAttribute("open", "");
+    $("dClose").focus();
+  }
+  function closeDetail() { if (dlg.open) dlg.close(); }
+  $("dClose").addEventListener("click", closeDetail);
+  dlg.addEventListener("click", (e) => { if (e.target === dlg) closeDetail(); });
+
+  /* ================= DAFTAR & PILIHAN ================= */
+  let filter = "Semua", currentId = null, spinTimer = null;
+  const chipEls = [];
 
   function buildStatic() {
     const f = $("filters");
     ["Semua", ...CATS].forEach((c) => {
-      const b = document.createElement("button");
-      b.type = "button"; b.className = "chip"; b.textContent = c;
+      const b = el("button", "chip", c);
+      b.type = "button"; b.dataset.cat = c;
       b.setAttribute("aria-pressed", String(c === filter));
       b.addEventListener("click", () => {
         filter = c; currentId = null;
-        [...f.children].forEach((x) => x.setAttribute("aria-pressed", String(x.textContent === c)));
+        chipEls.forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.cat === c)));
         setResult(null); render();
       });
-      f.appendChild(b);
+      f.appendChild(b); chipEls.push(b);
     });
     CATS.forEach((c) => $("cat").appendChild(Object.assign(document.createElement("option"), { value: c, textContent: c })));
   }
 
-  const pool = () => items.filter((i) => !i.done && (filter === "Semua" || i.cat === filter));
+  const inFilter = (i) => !i.done && (filter === "Semua" || i.cat === filter);
+  const pool = () => items.filter(inFilter);
 
   function setResult(item, state) {
     const r = $("result");
@@ -234,19 +441,48 @@
       $("finish").hidden = true;
       return;
     }
-    r.append(item.title);
-    r.appendChild(Object.assign(document.createElement("small"), { textContent: item.cat }));
+    if (state === "final") {
+      r.appendChild(coverEl(item.cover, item.title, "sm"));
+      const t = el("div", "rtext");
+      t.appendChild(el("strong", "rtitle", item.title));
+      t.appendChild(el("span", "rsub", [item.cat, item.kind].filter(Boolean).join(" · ")));
+      if (item.syn) t.appendChild(el("p", "rsyn", item.syn));
+      if (hasDetail(item)) {
+        const b = el("button", "linkbtn", "Lihat detail"); b.type = "button";
+        b.addEventListener("click", () => openItemDetail(item));
+        t.appendChild(b);
+      }
+      r.appendChild(t);
+    } else {
+      r.append(item.title);
+      r.appendChild(el("small", "", item.cat));
+    }
     $("finish").hidden = state !== "final";
   }
 
-  function rowFor(it, opts) {
-    const li = document.createElement("li");
-    if (it.done) li.className = "is-done";
-    li.appendChild(Object.assign(document.createElement("span"), { className: "t", textContent: it.title }));
-    li.appendChild(Object.assign(document.createElement("span"), { className: "c", textContent: it.cat }));
-    opts.forEach(([label, text, fn]) => {
-      const b = document.createElement("button");
-      b.type = "button"; b.className = "icon"; b.textContent = text;
+  function openItemDetail(it) {
+    const close = el("button", "btn ghost sm", "Tutup"); close.type = "button";
+    close.addEventListener("click", closeDetail);
+    openDetail(it, [close]);
+  }
+
+  function itemRow(it, buttons) {
+    const li = el("li", it.done ? "is-done" : "");
+    if (it.cover) li.appendChild(coverEl(it.cover, it.title, "xs"));
+    const t = el("div", "t");
+    if (hasDetail(it)) {
+      const b = el("button", "linkbtn name", it.title);
+      b.type = "button"; b.style.color = "inherit"; b.style.textDecoration = "none"; b.style.fontWeight = "600"; b.style.padding = "0"; b.style.minHeight = "0";
+      b.setAttribute("aria-label", "Lihat detail: " + it.title);
+      b.addEventListener("click", () => openItemDetail(it));
+      t.appendChild(b);
+    } else t.appendChild(el("span", "name", it.title));
+    const sub = [it.kind, (it.genres || []).slice(0, 2).join(", ")].filter(Boolean).join(" · ");
+    if (sub) t.appendChild(el("span", "sub2", sub));
+    li.appendChild(t);
+    li.appendChild(el("span", "c", it.cat));
+    buttons.forEach(([label, text, fn]) => {
+      const b = el("button", "icon", text); b.type = "button";
       b.setAttribute("aria-label", label + ": " + it.title);
       b.addEventListener("click", () => fn(it));
       li.appendChild(b);
@@ -255,27 +491,28 @@
   }
 
   function render() {
-    const active = items.filter((i) => !i.done && (filter === "Semua" || i.cat === filter));
+    const active = items.filter(inFilter);
     const done = items.filter((i) => i.done);
     const L = $("list"); L.textContent = "";
-    active.forEach((it) => L.appendChild(rowFor(it, [["Hapus", "✕", removeItem]])));
+    active.forEach((it) => L.appendChild(itemRow(it, [["Hapus", "✕", removeItem]])));
     $("count").textContent = active.length;
     $("listEmpty").hidden = active.length > 0;
     const D = $("doneList"); D.textContent = "";
-    done.forEach((it) => D.appendChild(rowFor(it, [["Kembalikan ke daftar", "↩", restoreItem], ["Hapus", "✕", removeItem]])));
+    done.forEach((it) => D.appendChild(itemRow(it, [["Kembalikan ke daftar", "↩", restoreItem], ["Hapus", "✕", removeItem]])));
     $("doneCount").textContent = done.length;
+    const act = items.filter((i) => !i.done);
+    chipEls.forEach((b) => { const c = b.dataset.cat; b.textContent = c + " (" + (c === "Semua" ? act.length : act.filter((i) => i.cat === c).length) + ")"; });
     if (!currentId) setResult(null);
     renderPop();
   }
 
-  /* ---------- aksi ---------- */
-  function addItem(rawTitle, cat) {
+  function addItem(rawTitle, cat, extra) {
     const title = String(rawTitle).trim().slice(0, MAX_LEN);
     if (!title) return false;
     if (items.length >= MAX_ITEMS) { toast("Daftar sudah penuh (" + MAX_ITEMS + ")."); return false; }
     if (items.some((i) => i.cat === cat && i.title.toLowerCase() === title.toLowerCase())) { toast("Sudah ada di daftar."); return false; }
-    items.push({ id: uid(), title, cat, done: false });
-    save(); render(); toast("Ditambahkan.");
+    items.push(clean(Object.assign({}, extra || {}, { title, cat, done: false, id: uid() })));
+    save(); render(); toast("Ditambahkan ke " + cat + ".");
     return true;
   }
   $("addForm").addEventListener("submit", (e) => {
@@ -304,38 +541,26 @@
     if (!it) return;
     it.done = true; currentId = null; save(); render(); toast("Ditandai selesai.");
   });
-
   function restoreItem(it) { it.done = false; save(); render(); }
-
-  let undo = null, toastTimer = null;
   function removeItem(it) {
     const idx = items.findIndex((x) => x.id === it.id);
     if (idx < 0) return;
     const [gone] = items.splice(idx, 1);
     if (gone.id === currentId) currentId = null;
     undo = { gone, idx };
-    save(); render();
-    toast("Dihapus.", true);
+    save(); render(); toast("Dihapus.", true);
   }
   $("toastBtn").addEventListener("click", () => {
     if (!undo) return;
     items.splice(Math.min(undo.idx, items.length), 0, undo.gone);
     undo = null; save(); render(); toast("Dikembalikan.");
   });
-  function toast(msg, withUndo) {
-    clearTimeout(toastTimer);
-    $("toastMsg").textContent = msg;
-    $("toastBtn").hidden = !withUndo;
-    $("toast").hidden = false;
-    toastTimer = setTimeout(() => { $("toast").hidden = true; if (withUndo) undo = null; }, withUndo ? 6000 : 2200);
-  }
 
-  /* ---------- cadangan ---------- */
+  /* ================= CADANGAN ================= */
   $("export").addEventListener("click", () => {
     const blob = new Blob([JSON.stringify(items, null, 2)], { type: "application/json" });
     const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "malam-ini-cadangan.json";
+    a.href = URL.createObjectURL(blob); a.download = "malam-ini-cadangan.json";
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
     toast("Cadangan diunduh.");
@@ -345,7 +570,7 @@
     const f = e.target.files[0];
     e.target.value = "";
     if (!f) return;
-    if (f.size > 1024 * 1024) return toast("File terlalu besar.");
+    if (f.size > 2 * 1024 * 1024) return toast("File terlalu besar.");
     try {
       const data = JSON.parse(await f.text());
       if (!Array.isArray(data)) throw new Error("bukan daftar");
@@ -358,40 +583,66 @@
     } catch (err) { toast("File cadangan tidak valid."); }
   });
 
-  /* ---------- Lagi populer (AniList, hanya saat diminta) ---------- */
-  const POP_KEY = "malam-ini-pop-v1", POP_TTL = 30 * 60 * 1000;
-  const POP_QUERY = "query { Page(page: 1, perPage: 30) { media(type: MANGA, sort: TRENDING_DESC, isAdult: false) { id title { romaji english } genres averageScore siteUrl } } }";
-  let popData = [];
+  /* ================= LAGI POPULER (AniList, hanya saat diminta) ================= */
+  const POP_TTL = 30 * 60 * 1000;
+  const POP_QUERY = "query ($type: MediaType) { Page(page: 1, perPage: 30) { media(type: $type, sort: TRENDING_DESC, isAdult: false) { id title { romaji english } format countryOfOrigin status startDate { year } genres averageScore description(asHtml: false) coverImage { large } siteUrl } } }";
+  let popSrc = "manga";
+  let popLoading = false;
+  const popData = { manga: [], anime: [] };
+  const STATUS = { RELEASING: "Sedang berjalan", FINISHED: "Tamat", NOT_YET_RELEASED: "Belum rilis", CANCELLED: "Dibatalkan", HIATUS: "Hiatus" };
+  const ANIME_FMT = { TV: "Anime · TV", TV_SHORT: "Anime · TV pendek", MOVIE: "Film anime", SPECIAL: "Anime · Spesial", OVA: "Anime · OVA", ONA: "Anime · ONA", MUSIC: "Video musik" };
+  const COUNTRY = { JP: "Manga", KR: "Manhwa", CN: "Manhua", TW: "Manhua" };
+  const popCat = () => (popSrc === "anime" ? "Nonton" : "Komik");
+  const cacheKey = (s) => "malam-ini-pop-v2-" + s;
 
-  function popCacheGet() {
-    try {
-      const o = JSON.parse(localStorage.getItem(POP_KEY));
-      if (o && Array.isArray(o.d) && Date.now() - o.t < POP_TTL) return o.d.map(normPop).filter(Boolean);
-    } catch (e) {}
-    return null;
+  function kindOf(m, src) {
+    if (src === "anime") return ANIME_FMT[m.format] || "Anime";
+    if (m.format === "NOVEL") return "Novel";
+    if (m.format === "ONE_SHOT") return "One-shot";
+    return COUNTRY[m.countryOfOrigin] || "Komik";
   }
-  function popCacheSet(d) { try { localStorage.setItem(POP_KEY, JSON.stringify({ t: Date.now(), d })); } catch (e) {} }
-
-  function normPop(m) {
+  function cleanSyn(html) {
+    if (typeof html !== "string") return "";
+    const withBreaks = html.replace(/<br\s*\/?>/gi, "\n");
+    const doc = new DOMParser().parseFromString(withBreaks, "text/html"); // dokumen mati: skrip tidak dijalankan
+    doc.querySelectorAll("script, style").forEach((n) => n.remove());
+    return (doc.body.textContent || "").replace(/\n{3,}/g, "\n\n").trim().slice(0, MAX_SYN * 2);
+  }
+  function normPop(m, src) {
     if (!m || typeof m !== "object") return null;
     const t = m.title && (m.title.english || m.title.romaji);
     if (typeof t !== "string" || !t.trim()) return null;
     return {
       title: t.trim().slice(0, MAX_LEN),
+      kind: kindOf(m, src),
       genres: Array.isArray(m.genres) ? m.genres.filter((g) => typeof g === "string").slice(0, 6) : [],
       score: typeof m.averageScore === "number" ? Math.round(m.averageScore) : null,
-      url: typeof m.siteUrl === "string" && m.siteUrl.startsWith("https://anilist.co/") ? m.siteUrl : null
+      year: m.startDate && Number.isInteger(m.startDate.year) ? m.startDate.year : null,
+      status: STATUS[m.status] || "",
+      syn: cleanSyn(m.description),
+      cover: okCover(m.coverImage && m.coverImage.large),
+      url: okPage(m.siteUrl)
     };
   }
+  const extraOf = (x) => ({ kind: x.kind, genres: x.genres.slice(0, 4), score: x.score == null ? undefined : x.score, syn: x.syn.slice(0, MAX_SYN), cover: x.cover, url: x.url });
 
-  async function fetchPop() {
+  function cacheGet(src) {
+    try {
+      const o = JSON.parse(localStorage.getItem(cacheKey(src)));
+      if (o && Array.isArray(o.d) && Date.now() - o.t < POP_TTL) return o.d;
+    } catch (e) {}
+    return null;
+  }
+  function cacheSet(src, d) { try { localStorage.setItem(cacheKey(src), JSON.stringify({ t: Date.now(), d })); } catch (e) {} }
+
+  async function fetchPop(src) {
     const ctl = new AbortController();
     const to = setTimeout(() => ctl.abort(), 8000);
     try {
       const res = await fetch("https://graphql.anilist.co", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Accept": "application/json" },
-        body: JSON.stringify({ query: POP_QUERY }),
+        body: JSON.stringify({ query: POP_QUERY, variables: { type: src === "anime" ? "ANIME" : "MANGA" } }),
         signal: ctl.signal
       });
       if (res.status === 429) throw new Error("rate");
@@ -403,80 +654,98 @@
     } finally { clearTimeout(to); }
   }
 
-  function popNote(msg, isErr) {
-    const n = $("popNote");
-    n.textContent = msg;
-    n.classList.toggle("pop-note-err", !!isErr);
+  function setPopNote(msg, isErr) { const n = $("popNote"); n.textContent = msg; n.classList.toggle("err", !!isErr); }
+
+  function showSkeleton() {
+    const L = $("popList"); L.textContent = "";
+    for (let i = 0; i < 6; i++) {
+      const li = el("li", "pcard skel");
+      li.appendChild(el("div", "cover"));
+      li.appendChild(el("div", "bar")); li.appendChild(el("div", "bar"));
+      L.appendChild(li);
+    }
   }
 
   async function loadPop() {
-    const btn = $("popLoad");
+    const src = popSrc, btn = $("popLoad");
     btn.disabled = true; btn.textContent = "Memuat…";
+    popLoading = !popData[src].length;
+    if (popLoading) showSkeleton();
     try {
-      let list = popCacheGet();
-      let fromCache = !!list;
-      if (!list) {
-        const raw = await fetchPop();
-        popCacheSet(raw);
-        list = raw.map(normPop).filter(Boolean);
-      }
-      popData = list;
-      buildGenres();
-      renderPop();
-      popNote(list.length ? "Data dari AniList" + (fromCache ? " (tersimpan, diperbarui tiap 30 menit)" : "") + ". Pilih genre, lalu tambahkan yang menarik." : "AniList tidak mengembalikan data.", !list.length);
+      let raw = cacheGet(src), fromCache = !!raw;
+      if (!raw) { raw = await fetchPop(src); cacheSet(src, raw); }
+      popLoading = false;
+      popData[src] = raw.map((m) => normPop(m, src)).filter(Boolean);
+      if (src !== popSrc) return;
+      buildGenres(); renderPop();
+      const n = popData[src].length;
+      setPopNote(n ? "Data dari AniList" + (fromCache ? " (tersimpan, diperbarui tiap 30 menit)" : "") + ". Ketuk kartu untuk detail, atau + untuk menambah." : "AniList tidak mengembalikan data.", !n);
     } catch (e) {
-      const msg = e && e.message === "rate" ? "AniList sedang membatasi permintaan. Coba lagi beberapa menit lagi."
+      popLoading = false;
+      $("popList").textContent = "";
+      renderPop();
+      setPopNote(e && e.message === "rate" ? "AniList sedang membatasi permintaan. Coba lagi beberapa menit lagi."
         : e && e.name === "AbortError" ? "AniList tidak merespons (waktu habis). Coba lagi."
         : e && (e.message === "shape" || e.message === "http" || e.name === "SyntaxError") ? "AniList membalas dengan data yang tidak bisa dipakai. Coba lagi nanti."
-        : "Tidak bisa menjangkau AniList. Cek koneksimu; bisa juga diblokir oleh browser atau jaringan.";
-      popNote(msg, true);
+        : "Tidak bisa menjangkau AniList. Cek koneksimu; bisa juga diblokir oleh browser atau jaringan.", true);
     } finally {
-      btn.disabled = false; btn.textContent = popData.length ? "Muat ulang" : "Muat yang populer";
+      popLoading = false;
+      btn.disabled = false; btn.textContent = popData[popSrc].length ? "Muat ulang" : "Muat yang populer";
     }
   }
 
   function buildGenres() {
-    const sel = $("popGenre");
-    const prev = sel.value;
-    const all = [...new Set(popData.flatMap((x) => x.genres))].sort();
+    const sel = $("popGenre"), prev = sel.value;
+    const all = [...new Set(popData[popSrc].flatMap((x) => x.genres))].sort();
     sel.textContent = "";
     sel.appendChild(Object.assign(document.createElement("option"), { value: "", textContent: "Semua genre" }));
     all.forEach((g) => sel.appendChild(Object.assign(document.createElement("option"), { value: g, textContent: g })));
     if (all.includes(prev)) sel.value = prev;
-    sel.hidden = !popData.length;
+    sel.hidden = !popData[popSrc].length;
   }
 
   function renderPop() {
     const L = $("popList");
+    if (popLoading) return; // jangan timpa skeleton saat data belum datang
     L.textContent = "";
-    const g = $("popGenre").value;
-    popData.filter((x) => !g || x.genres.includes(g)).forEach((x) => {
-      const li = document.createElement("li");
-      li.className = "pop-item";
-      const box = document.createElement("div");
-      box.style.flex = "1 1 160px";
-      box.appendChild(Object.assign(document.createElement("span"), { className: "t", textContent: x.title }));
-      const meta = [x.genres.slice(0, 3).join(", "), x.score != null ? "skor " + x.score + "/100" : ""].filter(Boolean).join(" · ");
-      if (meta) box.appendChild(Object.assign(document.createElement("span"), { className: "meta", textContent: meta }));
-      li.appendChild(box);
-      const exists = items.some((i) => i.cat === "Komik" && i.title.toLowerCase() === x.title.toLowerCase());
-      const add = document.createElement("button");
-      add.type = "button"; add.className = "btn ghost";
-      add.textContent = exists ? "Sudah ada" : "Tambah";
-      add.disabled = exists;
+    const g = $("popGenre").value, cat = popCat();
+    popData[popSrc].filter((x) => !g || x.genres.includes(g)).forEach((x, idx) => {
+      const li = el("li", "pcard");
+      li.style.animationDelay = Math.min(idx, 10) * 30 + "ms";
+      const open = el("button", "popen"); open.type = "button";
+      open.setAttribute("aria-label", "Lihat detail: " + x.title);
+      const cv = coverEl(x.cover, x.title, "");
+      if (x.score != null) cv.appendChild(el("span", "pill", "★ " + x.score));
+      cv.appendChild(el("span", "pkind", x.kind));
+      open.appendChild(cv);
+      open.appendChild(el("span", "ptitle", x.title));
+      open.appendChild(el("span", "pmeta", x.genres.slice(0, 3).join(", ")));
+      open.addEventListener("click", () => {
+        const exists = items.some((i) => i.cat === cat && i.title.toLowerCase() === x.title.toLowerCase());
+        const add = el("button", "btn sm", exists ? "Sudah ada di daftar" : "Tambah ke daftar"); add.type = "button"; add.disabled = exists;
+        add.addEventListener("click", () => { if (addItem(x.title, cat, extraOf(x))) closeDetail(); });
+        const close = el("button", "btn ghost sm", "Tutup"); close.type = "button"; close.addEventListener("click", closeDetail);
+        openDetail(x, [add, close]);
+      });
+      li.appendChild(open);
+      const exists = items.some((i) => i.cat === cat && i.title.toLowerCase() === x.title.toLowerCase());
+      const add = el("button", "padd", exists ? "✓" : "+"); add.type = "button"; add.disabled = exists;
       add.setAttribute("aria-label", (exists ? "Sudah ada: " : "Tambah ke daftar: ") + x.title);
-      add.addEventListener("click", () => addItem(x.title, "Komik"));
+      add.addEventListener("click", () => addItem(x.title, cat, extraOf(x)));
       li.appendChild(add);
-      if (x.url) {
-        const a = document.createElement("a");
-        a.href = x.url; a.target = "_blank"; a.rel = "noopener noreferrer"; a.textContent = "Buka";
-        a.setAttribute("aria-label", "Buka di AniList: " + x.title);
-        li.appendChild(a);
-      }
       L.appendChild(li);
     });
   }
 
+  document.querySelectorAll("#srcSeg button").forEach((b) => b.addEventListener("click", () => {
+    popSrc = b.dataset.src;
+    document.querySelectorAll("#srcSeg button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    $("popGenre").value = "";
+    $("popList").textContent = "";
+    buildGenres(); renderPop();
+    $("popLoad").textContent = popData[popSrc].length ? "Muat ulang" : "Muat yang populer";
+    setPopNote(popData[popSrc].length ? "Ketuk kartu untuk detail, atau + untuk menambah." : "Tekan tombol untuk memuat yang sedang populer. Konten dewasa disaring.", false);
+  }));
   $("popLoad").addEventListener("click", loadPop);
   $("popGenre").addEventListener("change", renderPop);
 
